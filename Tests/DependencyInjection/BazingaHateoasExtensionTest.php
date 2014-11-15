@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersP
 use Symfony\Component\DependencyInjection\Compiler\ResolveDefinitionTemplatesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class BazingaHateoasExtensionTest extends TestCase
@@ -150,12 +152,14 @@ class BazingaHateoasExtensionTest extends TestCase
         }
 
         $router  = $this->getMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
+        /** @var Bundle[] $bundles */
         $bundles = array(
             new BazingaHateoasBundle($kernel),
             new JMSSerializerBundle($kernel),
         );
 
-        $extensions = array_map(function ($bundle) {
+        /** @var ExtensionInterface[] $extensions */
+        $extensions = array_map(function (Bundle $bundle) {
             return $bundle->getContainerExtension();
         }, $bundles);
 

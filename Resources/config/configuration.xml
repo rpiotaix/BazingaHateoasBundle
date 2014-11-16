@@ -43,11 +43,11 @@
         </service>
 
         <service id="hateoas.configuration.metadata.yaml_driver" class="%hateoas.configuration.metadata.yaml_driver.class%" public="false">
-            <argument type="service" id="jms_serializer.metadata.file_locator" />
+            <argument type="service" id="hateoas.configuration.metadata.file_locator" />
         </service>
 
         <service id="hateoas.configuration.metadata.xml_driver" class="%hateoas.configuration.metadata.xml_driver.class%" public="false">
-            <argument type="service" id="jms_serializer.metadata.file_locator" />
+            <argument type="service" id="hateoas.configuration.metadata.file_locator" />
         </service>
 
         <service id="hateoas.configuration.metadata.annotation_driver" class="%hateoas.configuration.metadata.annotation_driver.class%" public="false">

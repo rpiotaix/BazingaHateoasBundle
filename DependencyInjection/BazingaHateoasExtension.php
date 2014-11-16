@@ -10,12 +10,12 @@
 
 namespace Bazinga\Bundle\HateoasBundle\DependencyInjection;
 
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * @author William Durand <william.durand1@gmail.com>
@@ -25,10 +25,21 @@ class BazingaHateoasExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        foreach (array('serializer', 'configuration', 'generator', 'helper', 'twig') as $file) {
+        $configFiles = array('serializer', 'configuration', 'generator', 'helper', 'twig');
+        if ($useJmsFileLocator = $config['metadata']['directories']['use_jms_file_locator']) {
+            $configFiles[] = 'file_locator_default';
+        } else {
+            $configFiles[] = 'file_locator_custom';
+        }
+
+        foreach ($configFiles as $file) {
             $loader->load($file . '.xml');
+        }
+
+        if (!$useJmsFileLocator) {
+            $this->setFileLocatorMetadataFolder($config['metadata']['directories'], $container);
         }
 
         // Based on JMSSerializerBundle
@@ -60,5 +71,39 @@ class BazingaHateoasExtension extends Extension
         $container
             ->getDefinition('hateoas.event_subscriber.xml')
             ->replaceArgument(0, new Reference($config['serializer']['xml']));
+    }
+
+    /**
+     * Configures the FileLocator according to the bundle configuration
+     *
+     * Inspired from JMSSerializerBundle
+     *
+     * @param array $metadataDirConfig
+     * @param ContainerBuilder $container
+     */
+    private function setFileLocatorMetadataFolder(array $metadataDirConfig, ContainerBuilder $container)
+    {
+        $locatorDefinition = $container->getDefinition('hateoas.configuration.metadata.file_locator');
+
+        $directories = array();
+        $bundles = $container->getParameter('kernel.bundles');
+
+        if ($metadataDirConfig['all_bundles']) {
+            foreach ($bundles as $name => $class) {
+                $ref = new \ReflectionClass($class);
+
+                $directories[$ref->getNamespaceName()] = dirname($ref->getFileName()) . '/Resources/config/hateoas';
+            }
+        } else {
+            foreach ($metadataDirConfig['bundles'] as $bundleName) {
+                if ($class = $bundles[$bundleName]) {
+                    $ref = new \ReflectionClass($class);
+
+                    $directories[$ref->getNamespaceName()] = dirname($ref->getFileName()) . '/Resources/config/hateoas';
+                }
+            }
+        }
+
+        $locatorDefinition->replaceArgument(0, $directories);
     }
 }

@@ -1,14 +1,21 @@
 {
-    "name": "willdurand/hateoas-bundle",
+    "name": "rpiotaix/hateoas-bundle",
     "description": "Integration of Hateoas into Symfony2.",
-    "keywords": [ "rest", "hateoas" ],
+    "keywords": [
+        "rest",
+        "hateoas"
+    ],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {
-        "name": "William Durand",
-        "email": "william.durand1@gmail.com"
-    }
+            "name": "William Durand",
+            "email": "william.durand1@gmail.com"
+        },
+        {
+            "name": "Rémi Piotaix",
+            "email": "remi.piotaix@gmail.com"
+        }
     ],
     "require": {
         "symfony/framework-bundle": "~2.2",
@@ -21,7 +28,7 @@
         "phpunit/phpunit": "~4"
     },
     "autoload": {
-        "psr-0": { "Bazinga\\Bundle\\HateoasBundle": "" }
+        "psr-0": {"Bazinga\\Bundle\\HateoasBundle": ""}
     },
     "target-dir": "Bazinga/Bundle/HateoasBundle",
     "extra": {
